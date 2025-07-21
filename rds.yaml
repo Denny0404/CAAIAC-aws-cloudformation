@@ -1,15 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: RDS MySQL Instance with Security Group
+Description: RDS MySQL Instance with Security Group and 2-subnet SubnetGroup
 
 Parameters:
-  SubnetId:
+  SubnetIdA:
     Type: String
-    Description: Subnet for RDS
-    Default: subnet-0e699773a388d27ad
+    Description: Subnet A for RDS (us-east-1a)
+  SubnetIdB:
+    Type: String
+    Description: Subnet B for RDS (us-east-1c)
   VpcId:
     Type: String
     Description: VPC ID
-    Default: vpc-087a31168107445a5
 
 Resources:
   RDSSecurityGroup:
@@ -31,7 +32,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: "Subnet group for assignment3 RDS"
       SubnetIds:
-        - !Ref SubnetId
+        - !Ref SubnetIdA
+        - !Ref SubnetIdB
       DBSubnetGroupName: assignment3-dbsubnet
 
   MyRDSInstance:

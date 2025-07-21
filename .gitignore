@@ -1,0 +1,44 @@
+# Ignore Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+ENV/
+env.bak/
+*.sqlite3
+
+# Ignore Codespaces/VSCode/temp files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.log
+
+# Ignore OS and editor files
+Thumbs.db
+ehthumbs.db
+*.bak
+*.tmp
+*.temp
+
+# Ignore AWS credentials (never push keys!)
+.aws/
+*.pem
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore system files and directories
+node_modules/
+dist/
+build/
+*.egg-info/
+.cache/
+*.egg
+
+# Ignore large temp folders from Codespaces
+/tmp/

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Networking resources for Assignment 3
+Description: VPC with two public subnets in different AZs for EC2 and RDS
 
 Resources:
   T2VPC:
@@ -8,28 +8,53 @@ Resources:
       CidrBlock: 10.0.0.0/23
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      Tags: [{ Key: Name, Value: t2-vpc }]
-  T2Subnet:
+      Tags:
+        - Key: Name
+          Value: t2-vpc
+
+  T2SubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref T2VPC
       CidrBlock: 10.0.0.0/24
+      AvailabilityZone: us-east-1a
       MapPublicIpOnLaunch: true
-      Tags: [{ Key: Name, Value: t2-subnet }]
+      Tags:
+        - Key: Name
+          Value: t2-subnet-a
+
+  T2SubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref T2VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-east-1c
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: t2-subnet-b
+
   T2IGW:
     Type: AWS::EC2::InternetGateway
     Properties:
-      Tags: [{ Key: Name, Value: t2-igw }]
+      Tags:
+        - Key: Name
+          Value: t2-igw
+
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref T2VPC
       InternetGatewayId: !Ref T2IGW
+
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref T2VPC
-      Tags: [{ Key: Name, Value: PublicRouteTable }]
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+
   DefaultRoute:
     Type: AWS::EC2::Route
     DependsOn: AttachGateway
@@ -37,14 +62,26 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref T2IGW
-  SubnetRouteTableAssociation:
+
+  SubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref T2Subnet
+      SubnetId: !Ref T2SubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref T2SubnetB
       RouteTableId: !Ref PublicRouteTable
 
 Outputs:
   VPCId:
+    Description: VPC ID
     Value: !Ref T2VPC
-  SubnetId:
-    Value: !Ref T2Subnet
+  SubnetIdA:
+    Description: Subnet A ID (us-east-1a)
+    Value: !Ref T2SubnetA
+  SubnetIdB:
+    Description: Subnet B ID (us-east-1c)
+    Value: !Ref T2SubnetB

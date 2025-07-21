@@ -4,8 +4,10 @@ Description: EC2 Instance Deployment with SSH Security Group
 Parameters:
   SubnetId:
     Type: String
-    Description: Subnet for the EC2 instance
-    Default: subnet-0e699773a388d27ad
+    Description: Subnet for EC2 instance (use Subnet A from networking stack)
+  VpcId:
+    Type: String
+    Description: VPC ID
   InstanceType:
     Type: String
     Default: t2.micro
@@ -16,24 +18,22 @@ Parameters:
     Description: EC2 instance type
   AMIid:
     Type: AWS::EC2::Image::Id
-    Default: ami-0c02fb55956c7d316  # Amazon Linux 2 in us-east-1
+    Default: ami-0c02fb55956c7d316
     Description: AMI ID for EC2
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair for SSH access
 
 Resources:
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow SSH access
-      VpcId: vpc-087a31168107445a5   # Replace with your actual VPCId from the outputs above
+      VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-        - IpProtocol: -1
-          FromPort: 0
-          ToPort: 0
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -47,6 +47,7 @@ Resources:
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
+      KeyName: !Ref KeyName
       Tags:
         - Key: Name
           Value: assignment3-ec2
