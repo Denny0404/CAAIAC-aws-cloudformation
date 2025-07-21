@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS MySQL Instance with Security Group
+
+Parameters:
+  SubnetId:
+    Type: String
+    Description: Subnet for RDS
+    Default: subnet-0e699773a388d27ad
+  VpcId:
+    Type: String
+    Description: VPC ID
+    Default: vpc-087a31168107445a5
+
+Resources:
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow MySQL access
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: rds-mysql-sg
+
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Subnet group for assignment3 RDS"
+      SubnetIds:
+        - !Ref SubnetId
+      DBSubnetGroupName: assignment3-dbsubnet
+
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: assignment3-db
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: admin
+      MasterUserPassword: AdminPassword123!
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      PubliclyAccessible: true
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      DBName: assignment3
+      BackupRetentionPeriod: 0
+
+Outputs:
+  RDSInstanceEndpoint:
+    Description: Endpoint of the RDS instance
+    Value: !GetAtt MyRDSInstance.Endpoint.Address
